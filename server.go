@@ -124,14 +124,14 @@ func Register(c gin.IRouter, method, path string, fn interface{}) (err error) {
 
 		rets := fnValue.Call(params)
 		if !rets[errIndex].IsNil() {
-			err = rets[1].Interface().(error)
+			err = rets[errIndex].Interface().(error)
 			c.JSON(200, Resp{Status: 500, Msg: err.Error()})
 			return
 		}
 		if hasOutParam {
-			c.JSON(200, Resp{Status: 200, Data: rets[0].Interface()})
+			c.JSON(200, Resp{Status: 0, Data: rets[0].Interface()})
 		} else {
-			c.JSON(200, Resp{Status: 200})
+			c.JSON(200, Resp{Status: 0})
 		}
 
 	})

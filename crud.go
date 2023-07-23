@@ -196,7 +196,7 @@ func (cd *Crud[T]) Delete(ctx *gin.Context) (err error) {
 		}
 	}
 	var t T
-	_, err = cd.db.Context(ctx).Table(&t).ID(strId).Delete()
+	_, err = cd.db.Context(ctx).ID(strId).Delete(&t)
 	if cd.deletePost != nil {
 		err = cd.deletePost(ctx, strId)
 		if err != nil {
