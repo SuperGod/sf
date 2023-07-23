@@ -55,10 +55,6 @@ type TestCrudData struct {
 	Addr string `json:"addr"`
 }
 
-func (d TestCrudData) GetID() any {
-	return d.ID
-}
-
 func TestCrud(t *testing.T) {
 	srv := NewServer()
 	db, err := xorm.NewEngine("sqlite", "./test.db")
@@ -66,10 +62,21 @@ func TestCrud(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	db.ShowSQL(true)
-	err = HandleCrud[TestCrudData](srv, "/data", db)
+	c, err := HandleCrud[TestCrudData](srv, "/data", db)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
+	createPre := func(c *gin.Context, src TestCrudData) (dst TestCrudData, err error) {
+		t.Log("createPre:", src)
+		dst = src
+		return
+	}
+	createPost := func(c *gin.Context, src TestCrudData) (dst TestCrudData, err error) {
+		t.Log("createPost:", src)
+		dst = src
+		return
+	}
+	c.SetCreateFn(createPre, createPost)
 	go func() {
 		err := srv.Run("localhost:8886")
 		if err != nil {
@@ -109,7 +116,7 @@ func TestCrud(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	t.Log(string(ret))
+	t.Log("get ret:", string(ret))
 
 	// Update one data
 	buf = bytes.NewBuffer([]byte(`{"name": "ab", "age":10,"addr":"Home"}`))
